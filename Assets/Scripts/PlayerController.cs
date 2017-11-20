@@ -7,11 +7,12 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private Transform m_CachedTransform;
     [SerializeField] private Rigidbody2D m_Rigidbody;
-    [SerializeField] private SpriteRenderer m_Renderer;
+    [SerializeField] private Transform m_ModelContainer;
     [SerializeField] private Transform m_AimTargetTransform;
     [SerializeField] private GameObject m_ArrowPrefab;
     [SerializeField] private DistanceJoint2D m_GrappleJoint;
     [SerializeField] private LineRenderer m_GrappleRenderer;
+    [SerializeField] private Sack m_Sack;
 
     [SerializeField] private float m_DefaultMoveSpeed = 5f;
     [SerializeField] private float m_CrouchedMoveSpeed = 3f;
@@ -156,11 +157,16 @@ public class PlayerController : MonoBehaviour
                 velocity.y = m_WallSlideVelocity;
             }
 
-            // flip sprite
-            m_Renderer.flipX = direction < 0f;
-
+            FlipSprite(direction);
             m_Rigidbody.velocity = velocity;
         }
+    }
+
+    private void FlipSprite(float direction)
+    {
+        Vector3 localScale = m_ModelContainer.localScale;
+        localScale.x = (direction < 0f ? -1 : 1);
+        m_ModelContainer.localScale = localScale;
     }
 
     private void Jump()
@@ -288,5 +294,30 @@ public class PlayerController : MonoBehaviour
         }
 
         //Debug.LogFormat("Zone: {0}, Enter: {1}", zone, enter);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Treasure"))
+        {
+            Treasure t = collision.gameObject.GetComponent<Treasure>();
+            if (t != null)
+            {
+                int value = t.Value;
+                bool accepted = m_Sack.Fill(value);
+                if (accepted)
+                {
+                    Destroy(collision.gameObject);
+                }
+                else
+                {
+                    t.Reject();
+                }
+            }
+            else
+            {
+                Debug.LogError("No treasure component found");
+            }
+        }
     }
 }
