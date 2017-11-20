@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Rewired;
@@ -129,6 +129,11 @@ public class PlayerController : MonoBehaviour
         if (m_Grappling)
         {
             m_GrappleRenderer.SetPosition(1, m_CachedTransform.position);
+        }
+        else if (!m_SurfaceBelow)
+        {
+            // you're not grappling and in the air, attempt to right the player
+            m_Rigidbody.MoveRotation(Mathf.Lerp(m_Rigidbody.rotation, 0f, 0.2f));
         }
     }
 
