@@ -11,6 +11,8 @@ public class Sack : MonoBehaviour
 
     private int m_CurrentAmount = 0;
 
+    public float WeightPercent { get { return m_CurrentAmount / (float)m_MaxCapacity; } }
+
     private void Start()
     {
         Scale();
@@ -34,11 +36,10 @@ public class Sack : MonoBehaviour
 
     private void Scale()
     {
-        float percentOfMax = m_CurrentAmount / (float)m_MaxCapacity;
-        float newScale = m_MinScale + percentOfMax * (m_MaxScale - m_MinScale);
+        float newScale = m_MinScale + WeightPercent * (m_MaxScale - m_MinScale);
 
         Debug.LogFormat("percent: {0}, min: {1}, max: {2}, new scale: {3}",
-            percentOfMax, m_MinScale, m_MaxScale, newScale);
+            WeightPercent, m_MinScale, m_MaxScale, newScale);
 
         Vector3 localScale = Vector3.one;
         localScale.x = newScale;
