@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,11 +11,17 @@ public class CollisionHandler : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        m_Controller.HandleTriggerCollision(m_Zone, true);
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
+        {
+            m_Controller.HandleTriggerCollision(m_Zone, true);
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        m_Controller.HandleTriggerCollision(m_Zone, false);
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
+        {
+            m_Controller.HandleTriggerCollision(m_Zone, false);
+        }
     }
 }
