@@ -541,7 +541,7 @@ MonoBehaviour:
     type: 2}
   m_GrappleJoint: {fileID: 232724960899418160}
   m_GrappleRenderer: {fileID: 120908203607606406}
-  m_Sack: {fileID: 0}
+  m_Sack: {fileID: 114781168424062504}
   m_DefaultMoveSpeed: 5
   m_CrouchedMoveSpeed: 2
   m_MaxJumpVelocity: 7
@@ -602,6 +602,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_CachedTransform: {fileID: 4848009217597368}
   m_MaxCapacity: 100
+  m_MinScale: 1
+  m_MaxScale: 3
 --- !u!120 &120908203607606406
 LineRenderer:
   m_ObjectHideFlags: 1

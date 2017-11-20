@@ -21,6 +21,8 @@ GameObject:
   - component: {fileID: 4009762672089440}
   - component: {fileID: 61232938489787638}
   - component: {fileID: 50032890901431396}
+  - component: {fileID: 114641224140150608}
+  - component: {fileID: 58514675805078382}
   m_Layer: 12
   m_Name: Crown
   m_TagString: Untagged
@@ -120,6 +122,21 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!58 &58514675805078382
+CircleCollider2D:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1304855772249890}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 0.5
 --- !u!61 &61232938489787638
 BoxCollider2D:
   m_ObjectHideFlags: 1
@@ -145,6 +162,19 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.56, y: 0.46}
   m_EdgeRadius: 0
+--- !u!114 &114641224140150608
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1304855772249890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a27536527a91e144afc29d5753b574b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Value: 20
+  m_Rigidbody: {fileID: 50032890901431396}
 --- !u!212 &212460725292157384
 SpriteRenderer:
   m_ObjectHideFlags: 1

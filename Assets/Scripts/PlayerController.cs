@@ -296,18 +296,18 @@ public class PlayerController : MonoBehaviour
         //Debug.LogFormat("Zone: {0}, Enter: {1}", zone, enter);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter2D(Collider2D collider)
     {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Treasure"))
+        if (collider.gameObject.layer == LayerMask.NameToLayer("Treasure"))
         {
-            Treasure t = collision.gameObject.GetComponent<Treasure>();
+            Treasure t = collider.gameObject.GetComponent<Treasure>();
             if (t != null)
             {
                 int value = t.Value;
                 bool accepted = m_Sack.Fill(value);
                 if (accepted)
                 {
-                    Destroy(collision.gameObject);
+                    Destroy(collider.gameObject);
                 }
                 else
                 {
