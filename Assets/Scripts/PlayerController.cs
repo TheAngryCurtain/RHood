@@ -39,6 +39,7 @@ public class PlayerController : MonoBehaviour
     private bool m_Aiming = false;
     private bool m_Grappling = false;
     private Vector3 m_TargetPos = Vector3.zero;
+    private GameObject m_PrevGrappleArrow;
 
     private void Awake()
     {
@@ -222,6 +223,7 @@ public class PlayerController : MonoBehaviour
     {
         GameObject arrowObj = (GameObject)Instantiate(m_ArrowPrefab, null);
         arrowObj.transform.position = m_AimTargetTransform.position;
+        m_PrevGrappleArrow = arrowObj;
 
         Arrow arrow = arrowObj.GetComponent<Arrow>();
         if (arrow != null)
@@ -234,6 +236,9 @@ public class PlayerController : MonoBehaviour
 
             Vector3 direction = (m_AimTargetTransform.position - m_CachedTransform.position).normalized;
             arrow.Launch(direction, m_ShootForce, callback);
+
+            // push player back
+            m_Rigidbody.AddForce(-direction * 2f, ForceMode2D.Impulse);
         }
     }
 
@@ -260,6 +265,12 @@ public class PlayerController : MonoBehaviour
 
     private void CancelGrapple()
     {
+        if (m_PrevGrappleArrow != null)
+        {
+            Destroy(m_PrevGrappleArrow, 5f);
+            m_PrevGrappleArrow = null;
+        }
+
         m_GrappleJoint.connectedBody = null;
         m_GrappleJoint.enabled = false;
 

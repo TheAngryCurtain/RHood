@@ -1,10 +1,13 @@
 fileFormatVersion: 2
 guid: e5cf9c3bdf42b574a9d9e48102b74ac5
-timeCreated: 1511211505
-licenseType: Pro
+timeCreated: 1511239089
+licenseType: Free
 TextureImporter:
   fileIDToRecycleName:
     21300000: gold_pile_0_0
+    21300002: gold_pile_0_1
+    21300004: gold_pile_0_2
+    21300006: gold_pile_0_3
   serializedVersion: 4
   mipmaps:
     mipMapMode: 0
@@ -84,9 +87,83 @@ TextureImporter:
         width: 56
         height: 50
       alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -28, y: 25}
+        - {x: -28, y: -25}
+        - {x: 28, y: -25}
+        - {x: 28, y: 25}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: gold_pile_0_1
+      rect:
+        serializedVersion: 2
+        x: 12
+        y: 9
+        width: 77
+        height: 72
+      alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
+      outline:
+      - - {x: -0.7962303, y: 36}
+        - {x: -38.5, y: 4}
+        - {x: -32.102814, y: -30.174187}
+        - {x: 12.626099, y: -33.48471}
+        - {x: 38.07469, y: -11.676037}
+        - {x: 38.5, y: 11.780315}
+        - {x: 27.48262, y: 13.787346}
+        - {x: 28.193413, y: 29.602806}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: gold_pile_0_2
+      rect:
+        serializedVersion: 2
+        x: 158
+        y: 73
+        width: 70
+        height: 84
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 31, y: 33}
+        - {x: 2, y: 41}
+        - {x: -22, y: 41}
+        - {x: -27, y: 34}
+        - {x: -24, y: 27}
+        - {x: -35, y: 4}
+        - {x: -35, y: -14.278847}
+        - {x: 5.825821, y: -41.6446}
+        - {x: 32, y: -32}
+        - {x: 35, y: -7}
+        - {x: 35, y: 24}
+      physicsShape: []
+      tessellationDetail: 0
+    - serializedVersion: 2
+      name: gold_pile_0_3
+      rect:
+        serializedVersion: 2
+        x: 135
+        y: 69
+        width: 37
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 1.6630096, y: 21}
+        - {x: -18.5, y: 21}
+        - {x: -18.5, y: -13.181213}
+        - {x: -2.0365448, y: -12.8198395}
+        - {x: 1.9286194, y: -21}
+        - {x: 18.5, y: -18}
+        - {x: 18.5, y: 2.9427872}
+        - {x: 12.986099, y: 8.28611}
+        - {x: 3.573227, y: 9.271828}
       physicsShape: []
       tessellationDetail: 0
     outline: []
