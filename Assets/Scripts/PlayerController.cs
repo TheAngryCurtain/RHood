@@ -10,8 +10,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform m_ModelContainer;
     [SerializeField] private Transform m_AimTargetTransform;
     [SerializeField] private GameObject m_ArrowPrefab;
-    [SerializeField] private DistanceJoint2D m_GrappleJoint;
-    [SerializeField] private LineRenderer m_GrappleRenderer;
     [SerializeField] private Sack m_Sack;
 
     [SerializeField] private float m_DefaultMoveSpeed = 5f;
@@ -22,6 +20,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float m_AccelerationAirborne = 0.75f;
     [SerializeField] private float m_WallSlideVelocity = -1f;
     [SerializeField] private float m_ShootForce = 5f;
+    [SerializeField] private int m_MaxGrappleCount = 1;
 
     private bool m_TouchingJumpableSurface { get { return m_SurfaceBelow || m_SurfaceLeft || m_SurfaceRight; } }
 
@@ -39,11 +38,23 @@ public class PlayerController : MonoBehaviour
     private bool m_Aiming = false;
     private bool m_Grappling = false;
     private Vector3 m_TargetPos = Vector3.zero;
-    private GameObject m_PrevGrappleArrow;
+
+    private int m_TotalGrapples = 0;
+    private List<GameObject> m_PrevGrappleArrows;
+    private List<DistanceJoint2D> m_GrappleJoints;
+    private List<LineRenderer> m_GrappleRenderers;
+
+    private Material m_GrappleMat;
 
     private void Awake()
     {
         InputManager.Instance.AddInputEventDelegate(OnInputRecieved, UpdateLoopType.Update);
+
+        m_GrappleMat = new Material(Shader.Find("Sprites/Default"));
+
+        m_PrevGrappleArrows = new List<GameObject>();
+        m_GrappleJoints = new List<DistanceJoint2D>();
+        m_GrappleRenderers = new List<LineRenderer>();
     }
 
     private void OnInputRecieved(InputActionEventData data)
@@ -130,7 +141,10 @@ public class PlayerController : MonoBehaviour
 
         if (m_Grappling)
         {
-            m_GrappleRenderer.SetPosition(1, m_CachedTransform.position);
+            for (int i = 0; i < m_GrappleRenderers.Count; i++)
+            {
+                m_GrappleRenderers[i].SetPosition(1, m_CachedTransform.position);
+            }
         }
         else if (!m_SurfaceBelow)
         {
@@ -230,7 +244,7 @@ public class PlayerController : MonoBehaviour
     {
         GameObject arrowObj = (GameObject)Instantiate(m_ArrowPrefab, null);
         arrowObj.transform.position = m_AimTargetTransform.position;
-        m_PrevGrappleArrow = arrowObj;
+        m_PrevGrappleArrows.Add(arrowObj);
 
         Arrow arrow = arrowObj.GetComponent<Arrow>();
         if (arrow != null)
@@ -256,33 +270,88 @@ public class PlayerController : MonoBehaviour
             CancelGrapple();
         }
 
-        Vector3 arrowPos = arrowRb.transform.position;
-        m_GrappleJoint.distance = (arrowPos - m_CachedTransform.position).magnitude;
-        m_GrappleJoint.connectedBody = arrowRb;
-        m_GrappleJoint.enabled = true;
+        //Vector3 arrowPos = arrowRb.transform.position;
+        //m_GrappleJoint.distance = (arrowPos - m_CachedTransform.position).magnitude;
+        //m_GrappleJoint.connectedBody = arrowRb;
+        //m_GrappleJoint.enabled = true;
 
-        // set static end of line
-        m_GrappleRenderer.enabled = true;
-        m_GrappleRenderer.positionCount = 2;
-        m_GrappleRenderer.SetPosition(0, arrowPos);
-        m_GrappleRenderer.SetPosition(1, m_CachedTransform.position);
+        //// set static end of line
+        //m_GrappleRenderer.enabled = true;
+        //m_GrappleRenderer.positionCount = 2;
+        //m_GrappleRenderer.SetPosition(0, arrowPos);
+        //m_GrappleRenderer.SetPosition(1, m_CachedTransform.position);
+
+        if (m_TotalGrapples >= m_MaxGrappleCount)
+        {
+            CancelGrapple();
+        }
+
+        BuildGrapple(arrowRb);
+        m_TotalGrapples += 1;
+
+        Debug.LogFormat("Adding Grapple: {0}", m_TotalGrapples);
 
         m_Grappling = true;
     }
 
+    private void BuildGrapple(Rigidbody2D connectedBody)
+    {
+        // build joint
+        DistanceJoint2D joint = this.gameObject.AddComponent<DistanceJoint2D>();
+        joint.enableCollision = true;
+        joint.maxDistanceOnly = true;
+
+        joint.distance = (connectedBody.transform.position - m_CachedTransform.position).magnitude;
+        joint.connectedBody = connectedBody;
+        joint.enabled = true;
+
+        m_GrappleJoints.Add(joint);
+
+        // build line renderer
+        LineRenderer renderer = this.gameObject.AddComponent<LineRenderer>();
+        renderer.material = m_GrappleMat;
+        renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        renderer.receiveShadows = false;
+        renderer.useWorldSpace = true;
+
+        AnimationCurve widthCurve = new AnimationCurve();
+        widthCurve.AddKey(0, 0.1f);
+        widthCurve.AddKey(1, 0.1f);
+        renderer.widthCurve = widthCurve;
+
+        renderer.startColor = new Color(0.486f, 0.192f, 0.192f, 1f);
+        renderer.endColor = new Color(0.486f, 0.192f, 0.192f, 1f);
+
+        renderer.enabled = true;
+        renderer.positionCount = 2;
+        renderer.SetPosition(0, connectedBody.transform.position);
+        renderer.SetPosition(1, m_CachedTransform.position);
+
+        m_GrappleRenderers.Add(renderer);
+    }
+
     private void CancelGrapple()
     {
-        if (m_PrevGrappleArrow != null)
+        if (m_PrevGrappleArrows.Count > 0)
         {
-            Destroy(m_PrevGrappleArrow, 5f);
-            m_PrevGrappleArrow = null;
+            Destroy(m_PrevGrappleArrows[0], 5f);
+            Destroy(m_GrappleJoints[0]);
+            Destroy(m_GrappleRenderers[0]);
+
+            m_PrevGrappleArrows.RemoveAt(0);
+            m_GrappleJoints.RemoveAt(0);
+            m_GrappleRenderers.RemoveAt(0);
+
+            m_TotalGrapples -= 1;
+
+            Debug.LogFormat("Removing Grapple: {0}", m_TotalGrapples);
         }
 
-        m_GrappleJoint.connectedBody = null;
-        m_GrappleJoint.enabled = false;
+        //m_GrappleJoint.connectedBody = null;
+        //m_GrappleJoint.enabled = false;
 
         m_Grappling = false;
-        m_GrappleRenderer.enabled = false;
+        //m_GrappleRenderer.enabled = false;
     }
 
     private void ShowAimTarget(bool show)

@@ -284,7 +284,29 @@ Prefab:
       propertyPath: m_RootOrder
       value: 6
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 232724960899418160, guid: 6c7e32d072075eb4eaea688767e433b3,
+        type: 2}
+      propertyPath: m_EnableCollision
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 232724960899418160, guid: 6c7e32d072075eb4eaea688767e433b3,
+        type: 2}
+      propertyPath: m_AutoConfigureDistance
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 232724960899418160, guid: 6c7e32d072075eb4eaea688767e433b3,
+        type: 2}
+      propertyPath: m_Distance
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 232724960899418160, guid: 6c7e32d072075eb4eaea688767e433b3,
+        type: 2}
+      propertyPath: m_MaxDistanceOnly
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 120908203607606406, guid: 6c7e32d072075eb4eaea688767e433b3, type: 2}
+    - {fileID: 232724960899418160, guid: 6c7e32d072075eb4eaea688767e433b3, type: 2}
   m_ParentPrefab: {fileID: 100100000, guid: 6c7e32d072075eb4eaea688767e433b3, type: 2}
   m_IsPrefabParent: 0
 --- !u!1 &566253893
