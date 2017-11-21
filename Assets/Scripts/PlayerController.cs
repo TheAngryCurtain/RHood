@@ -180,7 +180,14 @@ public class PlayerController : MonoBehaviour
             }
 
             Vector2 velocity = m_Rigidbody.velocity;
-            velocity.y = m_MaxJumpVelocity;
+
+            // account for sack weight
+            float deltaVelocity = m_MaxJumpVelocity - m_MinJumpVelocity;
+            float weightedVelocity = m_MaxJumpVelocity - (m_Sack.WeightPercent * deltaVelocity);
+
+            velocity.y = weightedVelocity;
+
+            Debug.LogFormat("weight %: {0}, weighted vel: {1}, min vel: {2}, max vel: {3}", m_Sack.WeightPercent, weightedVelocity, m_MinJumpVelocity, m_MaxJumpVelocity);
 
             m_Rigidbody.velocity = velocity;
             m_RequestJump = false;
