@@ -304,6 +304,11 @@ Prefab:
       propertyPath: m_MaxDistanceOnly
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114193678580042980, guid: 6c7e32d072075eb4eaea688767e433b3,
+        type: 2}
+      propertyPath: m_MaxGrappleCount
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 120908203607606406, guid: 6c7e32d072075eb4eaea688767e433b3, type: 2}
     - {fileID: 232724960899418160, guid: 6c7e32d072075eb4eaea688767e433b3, type: 2}

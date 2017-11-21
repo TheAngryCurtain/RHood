@@ -190,7 +190,7 @@ public class PlayerController : MonoBehaviour
         {
             if (m_Grappling)
             {
-                CancelGrapple();
+                CancelAllGrapples();
             }
 
             Vector2 velocity = m_Rigidbody.velocity;
@@ -265,10 +265,10 @@ public class PlayerController : MonoBehaviour
 
     private void OnGrappleArrowLanded(Rigidbody2D arrowRb)
     {
-        if (m_Grappling)
-        {
-            CancelGrapple();
-        }
+        //if (m_Grappling)
+        //{
+        //    CancelGrapple();
+        //}
 
         //Vector3 arrowPos = arrowRb.transform.position;
         //m_GrappleJoint.distance = (arrowPos - m_CachedTransform.position).magnitude;
@@ -283,10 +283,18 @@ public class PlayerController : MonoBehaviour
 
         if (m_TotalGrapples >= m_MaxGrappleCount)
         {
+            Debug.Log("Too many grapples!");
             CancelGrapple();
         }
 
-        BuildGrapple(arrowRb);
+        StartCoroutine(DelayBuildGrapple(arrowRb));
+    }
+
+    private IEnumerator DelayBuildGrapple(Rigidbody2D connectedBody)
+    {
+        yield return null;
+
+        BuildGrapple(connectedBody);
         m_TotalGrapples += 1;
 
         Debug.LogFormat("Adding Grapple: {0}", m_TotalGrapples);
@@ -307,8 +315,11 @@ public class PlayerController : MonoBehaviour
 
         m_GrappleJoints.Add(joint);
 
+        GameObject renderContainer = new GameObject("Rope");
+        renderContainer.transform.SetParent(m_CachedTransform);
+
         // build line renderer
-        LineRenderer renderer = this.gameObject.AddComponent<LineRenderer>();
+        LineRenderer renderer = renderContainer.AddComponent<LineRenderer>();
         renderer.material = m_GrappleMat;
         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         renderer.receiveShadows = false;
@@ -330,13 +341,29 @@ public class PlayerController : MonoBehaviour
         m_GrappleRenderers.Add(renderer);
     }
 
+    private void CancelAllGrapples()
+    {
+        m_GrappleJoints.Clear();
+        m_GrappleRenderers.Clear();
+
+        for (int i = 0; i < m_GrappleJoints.Count; i++)
+        {
+            Destroy(m_PrevGrappleArrows[i], 5f);
+            Destroy(m_GrappleJoints[i]);
+            Destroy(m_GrappleRenderers[i].gameObject);
+        }
+
+        m_TotalGrapples -= m_GrappleJoints.Count;
+        m_Grappling = false;
+    }
+
     private void CancelGrapple()
     {
         if (m_PrevGrappleArrows.Count > 0)
         {
             Destroy(m_PrevGrappleArrows[0], 5f);
             Destroy(m_GrappleJoints[0]);
-            Destroy(m_GrappleRenderers[0]);
+            Destroy(m_GrappleRenderers[0].gameObject);
 
             m_PrevGrappleArrows.RemoveAt(0);
             m_GrappleJoints.RemoveAt(0);
