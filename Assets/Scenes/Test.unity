@@ -124,7 +124,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!61 &147977146
 BoxCollider2D:
@@ -242,6 +242,62 @@ Prefab:
       propertyPath: m_RootOrder
       value: 7
       objectReference: {fileID: 0}
+    - target: {fileID: 1304007780627156, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1242507494292874, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1612504772599026, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939882212979846, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1623800286604580, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1103225633211314, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1538679736914626, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1219043835234650, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1337683994790626, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273278415448352, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1374449014728092, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1306669667244790, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1813058916543038, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1232451682692378, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
   m_IsPrefabParent: 0
@@ -309,7 +365,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!61 &566253894
 BoxCollider2D:
@@ -404,7 +460,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!61 &738894284
 BoxCollider2D:
@@ -531,6 +587,62 @@ Prefab:
     - target: {fileID: 1337683994790626, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
       propertyPath: m_Name
       value: Building (Foreground) (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 1612504772599026, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1538679736914626, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1103225633211314, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1337683994790626, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1306669667244790, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1242507494292874, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1273278415448352, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1374449014728092, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1219043835234650, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1623800286604580, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1304007780627156, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1232451682692378, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939882212979846, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1813058916543038, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_StaticEditorFlags
+      value: 4294967295
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
@@ -1506,7 +1618,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!61 &1848941196
 BoxCollider2D:

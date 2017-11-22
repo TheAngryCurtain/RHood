@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform m_AimTargetTransform;
     [SerializeField] private GameObject m_ArrowPrefab;
     [SerializeField] private Sack m_Sack;
-    [SerializeField] private DistanceJoint2D m_GrappleJoint;
+    //[SerializeField] private DistanceJoint2D m_GrappleJoint;
 
     [SerializeField] private float m_DefaultMoveSpeed = 5f;
     [SerializeField] private float m_CrouchedMoveSpeed = 3f;
@@ -195,7 +195,7 @@ public class PlayerController : MonoBehaviour
 
     private void Climb()
     {
-        m_GrappleJoint.distance -= m_MovementY * m_ClimbSpeed * (1f - m_Sack.WeightPercent) * Time.fixedDeltaTime;
+        m_PrevGrappleArrow.Reel(m_MovementY * m_ClimbSpeed * (1f - m_Sack.WeightPercent));
     }
 
     private void FlipSprite(float direction)
@@ -211,7 +211,8 @@ public class PlayerController : MonoBehaviour
         {
             if (m_Grappling)
             {
-                CancelGrapple();
+                m_PrevGrappleArrow.BreakGrapple();
+                m_Grappling = false;
             }
 
             Vector2 velocity = m_Rigidbody.velocity;
@@ -273,12 +274,12 @@ public class PlayerController : MonoBehaviour
         Arrow arrow = arrowObj.GetComponent<Arrow>();
         if (arrow != null)
         {
-            System.Action<Rigidbody2D> callback = null;
+            System.Action callback = null;
             if (grapple)
             {
                 if (m_Grappling)
                 {
-                    CancelGrapple();
+                    m_PrevGrappleArrow.BreakGrapple();
                 }
 
                 if (m_PrevGrappleArrow != null)
@@ -286,7 +287,7 @@ public class PlayerController : MonoBehaviour
                     m_PrevGrappleArrow.CancelGrapple();
                 }
 
-                callback = OnGrappleArrowLanded;
+                callback = () => { m_Grappling = true; };
                 m_PrevGrappleArrow = arrow;
             }
 
@@ -296,44 +297,6 @@ public class PlayerController : MonoBehaviour
             // push player back
             m_Rigidbody.AddForce(-direction * 2f, ForceMode2D.Impulse);
         }
-    }
-
-    private void OnGrappleArrowLanded(Rigidbody2D arrowRb)
-    {
-        if (m_Grappling)
-        {
-            CancelGrapple();
-        }
-
-        BuildGrapple(arrowRb);
-        m_Grappling = true;
-    }
-
-    private void BuildGrapple(Rigidbody2D connectedBody)
-    {
-        // build joint
-        m_GrappleJoint.distance = (connectedBody.transform.position - m_CachedTransform.position).magnitude;
-        m_GrappleJoint.connectedBody = connectedBody;
-        m_GrappleJoint.enabled = true;
-
-        // build line renderer
-        //m_GrappleRenderer.enabled = true;
-        //m_GrappleRenderer.positionCount = 2;
-        //m_GrappleRenderer.SetPosition(0, connectedBody.transform.position);
-        //m_GrappleRenderer.SetPosition(1, m_CachedTransform.position);
-    }
-
-    private void CancelGrapple()
-    {
-        if (m_PrevGrappleArrow != null)
-        {
-            m_PrevGrappleArrow.BreakGrapple();
-        }
-
-        m_GrappleJoint.connectedBody = null;
-        m_GrappleJoint.enabled = false;
-
-        m_Grappling = false;
     }
 
     private void ShowAimTarget(bool show)

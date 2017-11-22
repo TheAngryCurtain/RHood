@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,12 +7,14 @@ public class Arrow : MonoBehaviour
     [SerializeField] private Transform m_CachedTransform;
     [SerializeField] private Rigidbody2D m_Rigidbody;
     [SerializeField] private TrailRenderer m_Trail;
+
+    [SerializeField] private DistanceJoint2D m_RopeJoint;
     [SerializeField] private LineRenderer m_RopeRenderer;
 
     private bool m_Launched = false;
     private float m_PrevRotation;
     private Vector2 m_Velocity;
-    private System.Action<Rigidbody2D> m_GrappleCallback;
+    private System.Action m_GrappleCallback;
     private Transform m_Owner;
 
     private void FixedUpdate()
@@ -36,7 +38,7 @@ public class Arrow : MonoBehaviour
         }
     }
 
-    public void Launch(Vector2 direction, float power, Transform playerTransform, System.Action<Rigidbody2D> callback)
+    public void Launch(Vector2 direction, float power, Transform playerTransform, System.Action callback)
     {
         m_Owner = playerTransform;
         m_Rigidbody.AddForce(direction * power, ForceMode2D.Impulse);
@@ -52,21 +54,21 @@ public class Arrow : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Rope"))
-        {
-            // cut the rope
-            if (m_Rigidbody.velocity.magnitude > 5f)
-            {
-                HingeJoint2D joint = collision.gameObject.GetComponent<HingeJoint2D>();
-                if (joint != null)
-                {
-                    joint.connectedBody = null;
-                    joint.enabled = false;
-                }
-            }
-        }
-        else
-        {
+        //if (collision.gameObject.layer == LayerMask.NameToLayer("Rope"))
+        //{
+        //    // cut the rope
+        //    if (m_Rigidbody.velocity.magnitude > 5f)
+        //    {
+        //        HingeJoint2D joint = collision.gameObject.GetComponent<HingeJoint2D>();
+        //        if (joint != null)
+        //        {
+        //            joint.connectedBody = null;
+        //            joint.enabled = false;
+        //        }
+        //    }
+        //}
+        //else
+        //{
             //Debug.Log(m_Velocity.magnitude);
             m_Launched = false;
             m_Trail.enabled = false;
@@ -79,16 +81,30 @@ public class Arrow : MonoBehaviour
             m_Rigidbody.MoveRotation(m_PrevRotation);
             m_CachedTransform.SetParent(collision.transform);
 
+            SetGrapple(collision.gameObject);
+
             if (m_GrappleCallback != null)
             {
-                m_GrappleCallback(m_Rigidbody);
+                m_GrappleCallback();
             }
             else
             {
-                // TODO change this to when arrows go offscreen
+                // TODO change this to when arrows go off screen
                 Destroy(this.gameObject, 5f);
             }
-        }
+        //}
+    }
+
+    private void SetGrapple(GameObject hitObj)
+    {
+        m_RopeJoint.connectedBody = m_Owner.GetComponent<Rigidbody2D>();
+        m_RopeJoint.distance = (m_CachedTransform.position - m_Owner.position).magnitude;
+        m_RopeJoint.enabled = true;
+    }
+
+    public void Reel(float speed)
+    {
+        m_RopeJoint.distance -= speed * Time.fixedDeltaTime;
     }
 
     public void CancelGrapple()
@@ -100,6 +116,10 @@ public class Arrow : MonoBehaviour
     public void BreakGrapple()
     {
         m_RopeRenderer.enabled = false;
+
+        m_RopeJoint.connectedBody = null;
+        m_RopeJoint.enabled = false;
+
         Destroy(this.gameObject, 5f);
     }
 }
