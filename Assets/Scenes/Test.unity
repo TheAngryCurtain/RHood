@@ -340,13 +340,7 @@ Prefab:
       propertyPath: m_RootOrder
       value: 5
       objectReference: {fileID: 0}
-    - target: {fileID: 114193678580042980, guid: 6c7e32d072075eb4eaea688767e433b3,
-        type: 2}
-      propertyPath: m_WallJumpXForce
-      value: 7
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 120620400571857176, guid: 6c7e32d072075eb4eaea688767e433b3, type: 2}
+    m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6c7e32d072075eb4eaea688767e433b3, type: 2}
   m_IsPrefabParent: 0
 --- !u!1 &566253893
@@ -643,6 +637,22 @@ Prefab:
     - target: {fileID: 1813058916543038, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
       propertyPath: m_StaticEditorFlags
       value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 1939882212979846, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1813058916543038, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4465297750829752, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: -2.23
+      objectReference: {fileID: 0}
+    - target: {fileID: 4562862090433076, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0.54
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 59efcfc3956f54f41a5271640a33ad39, type: 2}
@@ -1252,6 +1262,15 @@ MonoBehaviour:
       _behaviorId: 0
       _userAssignable: 1
       _categoryId: 0
+    - _id: 9
+      _name: Drop_Sack
+      _type: 1
+      _descriptiveName: Drop Sack
+      _positiveDescriptiveName: 
+      _negativeDescriptiveName: 
+      _behaviorId: 0
+      _userAssignable: 1
+      _categoryId: 0
     actionCategories:
     - _name: Default
       _descriptiveName: Default
@@ -1261,7 +1280,7 @@ MonoBehaviour:
     actionCategoryMap:
       list:
       - categoryId: 0
-        actionIds: 0000000008000000040000000500000002000000030000000600000007000000
+        actionIds: 000000000800000004000000050000000200000003000000060000000700000009000000
     inputBehaviors:
     - _id: 0
       _name: Default
@@ -1372,7 +1391,7 @@ MonoBehaviour:
         _modifierKey2: 0
         _modifierKey3: 0
       - _actionCategoryId: 0
-        _actionId: -1
+        _actionId: 9
         _elementType: 1
         _elementIdentifierId: 5
         _axisRange: 0
@@ -1574,7 +1593,7 @@ MonoBehaviour:
     customControllerMaps: []
     customControllers: []
     playerIdCounter: 2
-    actionIdCounter: 9
+    actionIdCounter: 10
     actionCategoryIdCounter: 1
     inputBehaviorIdCounter: 1
     mapCategoryIdCounter: 1

@@ -79,12 +79,10 @@ public class Arrow : MonoBehaviour
 
             // restore the last rotation before the collision
             m_Rigidbody.MoveRotation(m_PrevRotation);
-            m_CachedTransform.SetParent(collision.transform);
-
-            SetGrapple(collision.gameObject);
 
             if (m_GrappleCallback != null)
             {
+                SetGrapple(collision.gameObject);
                 m_GrappleCallback();
             }
             else
@@ -110,6 +108,7 @@ public class Arrow : MonoBehaviour
     public void CancelGrapple()
     {
         m_RopeRenderer.enabled = false;
+        m_RopeJoint.enabled = false;
         m_GrappleCallback = null;
     }
 

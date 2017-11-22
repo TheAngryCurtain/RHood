@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform m_AimTargetTransform;
     [SerializeField] private GameObject m_ArrowPrefab;
     [SerializeField] private Sack m_Sack;
-    //[SerializeField] private DistanceJoint2D m_GrappleJoint;
+    [SerializeField] private Transform m_SackModelContainer;
 
     [SerializeField] private float m_DefaultMoveSpeed = 5f;
     [SerializeField] private float m_CrouchedMoveSpeed = 3f;
@@ -25,6 +25,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float m_ClimbSpeed = 2f;
 
     private bool m_TouchingJumpableSurface { get { return m_SurfaceBelow || m_SurfaceLeft || m_SurfaceRight; } }
+    private bool m_CarryingSack { get { return m_Sack.transform.parent == m_SackModelContainer; } }
+    private float m_SackWeightModifier { get { return m_CarryingSack ? 1f - m_Sack.WeightPercent : 1f; } }
+    private float m_SackWeightPercent { get { return m_CarryingSack ? m_Sack.WeightPercent : 0f; } }
 
     private float m_MovementX;
     private float m_MovementY;
@@ -87,6 +90,21 @@ public class PlayerController : MonoBehaviour
                     m_Aiming = false;
 
                     Shoot(data.actionId == RewiredConsts.Action.Grapple);
+                }
+                break;
+
+            // drop/pickup sack
+            case RewiredConsts.Action.Drop_Sack:
+                if (data.GetButtonDown())
+                {
+                    if (m_CarryingSack)
+                    {
+                        GameObject sackObj = m_Sack.gameObject;
+                        sackObj.transform.SetParent(null);
+
+                        Rigidbody2D sackRb = sackObj.GetComponent<Rigidbody2D>();
+                        sackRb.simulated = true;
+                    }
                 }
                 break;
 
@@ -169,7 +187,7 @@ public class PlayerController : MonoBehaviour
                     if (m_TouchingJumpableSurface)
                     {
                         smoothTime = m_AccelerationGrounded;
-                        //modifiedMovement = m_MovementX * (1f - m_Sack.WeightPercent);
+                        //modifiedMovement = m_MovementX * m_SackWeightModifier;
                     }
 
                     //velocity.x = Mathf.SmoothDamp(velocity.x, modifiedMovement, ref m_VelXSmooth, smoothTime);
@@ -185,7 +203,7 @@ public class PlayerController : MonoBehaviour
             else
             {
                 // add momentum during swinging?
-                m_Rigidbody.AddForce(Vector2.right * m_MovementX * 0.5f * (1f - m_Sack.WeightPercent), ForceMode2D.Force);
+                m_Rigidbody.AddForce(Vector2.right * m_MovementX * 0.5f * m_SackWeightModifier, ForceMode2D.Force);
             }
 
             FlipSprite(direction);
@@ -195,7 +213,7 @@ public class PlayerController : MonoBehaviour
 
     private void Climb()
     {
-        m_PrevGrappleArrow.Reel(m_MovementY * m_ClimbSpeed * (1f - m_Sack.WeightPercent));
+        m_PrevGrappleArrow.Reel(m_MovementY * m_ClimbSpeed * m_SackWeightModifier);
     }
 
     private void FlipSprite(float direction)
@@ -225,10 +243,10 @@ public class PlayerController : MonoBehaviour
 
             // account for sack weight
             float deltaVelocity = m_MaxJumpVelocity - m_MinJumpVelocity;
-            float weightedVelocity = m_MaxJumpVelocity - (m_Sack.WeightPercent * deltaVelocity);
+            float weightedVelocity = m_MaxJumpVelocity - (m_SackWeightPercent * deltaVelocity);
             velocity.y = weightedVelocity;
 
-            Debug.LogFormat("weight %: {0}, weighted vel: {1}, min vel: {2}, max vel: {3}", m_Sack.WeightPercent, weightedVelocity, m_MinJumpVelocity, m_MaxJumpVelocity);
+            Debug.LogFormat("weight %: {0}, weighted vel: {1}, min vel: {2}, max vel: {3}", m_SackWeightPercent, weightedVelocity, m_MinJumpVelocity, m_MaxJumpVelocity);
 
             m_Rigidbody.velocity = velocity;
             m_RequestJump = false;
@@ -280,6 +298,7 @@ public class PlayerController : MonoBehaviour
                 if (m_Grappling)
                 {
                     m_PrevGrappleArrow.BreakGrapple();
+                    m_PrevGrappleArrow = null;
                 }
 
                 if (m_PrevGrappleArrow != null)
@@ -330,7 +349,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collider)
     {
-        if (collider.gameObject.layer == LayerMask.NameToLayer("Treasure"))
+        if (m_CarryingSack && collider.gameObject.layer == LayerMask.NameToLayer("Treasure"))
         {
             Treasure t = collider.gameObject.GetComponent<Treasure>();
             if (t != null)
