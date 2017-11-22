@@ -46,9 +46,14 @@ public class PlayerController : MonoBehaviour
     private Vector3 m_TargetPos = Vector3.zero;
     private Arrow m_PrevGrappleArrow;
 
+    private bool m_CanPickupSack = false;
+
     private void Awake()
     {
         InputManager.Instance.AddInputEventDelegate(OnInputRecieved, UpdateLoopType.Update);
+
+        Physics2D.IgnoreCollision(m_Sack.GetComponent<Collider2D>(), GetComponent<Collider2D>());
+        m_Sack.Handle(m_CarryingSack);
     }
 
     private void OnInputRecieved(InputActionEventData data)
@@ -97,14 +102,28 @@ public class PlayerController : MonoBehaviour
             case RewiredConsts.Action.Drop_Sack:
                 if (data.GetButtonDown())
                 {
+                    GameObject sackObj = m_Sack.gameObject;
+                    Rigidbody2D sackRb = sackObj.GetComponent<Rigidbody2D>();
+
+                    Debug.Log(m_CarryingSack);
+
                     if (m_CarryingSack)
                     {
-                        GameObject sackObj = m_Sack.gameObject;
                         sackObj.transform.SetParent(null);
-
-                        Rigidbody2D sackRb = sackObj.GetComponent<Rigidbody2D>();
                         sackRb.simulated = true;
                     }
+                    else
+                    {
+                        if (m_CanPickupSack)
+                        {
+                            sackObj.transform.SetParent(m_SackModelContainer);
+                            sackObj.transform.localPosition = m_Sack.ModelOffset;
+
+                            sackRb.simulated = false;
+                        }
+                    }
+
+                    m_Sack.Handle(m_CarryingSack);
                 }
                 break;
 
@@ -369,6 +388,18 @@ public class PlayerController : MonoBehaviour
             {
                 Debug.LogError("No treasure component found");
             }
+        }
+        else if (collider.gameObject.layer == LayerMask.NameToLayer("Sack"))
+        {
+            m_CanPickupSack = true;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collider)
+    {
+        if (collider.gameObject.layer == LayerMask.NameToLayer("Sack"))
+        {
+            m_CanPickupSack = false;
         }
     }
 }

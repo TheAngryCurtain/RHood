@@ -183,6 +183,7 @@ GameObject:
   - component: {fileID: 114781168424062504}
   - component: {fileID: 50566317262314184}
   - component: {fileID: 58205561978255832}
+  - component: {fileID: 58205525388025286}
   m_Layer: 13
   m_Name: Sack
   m_TagString: Untagged
@@ -372,7 +373,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1866686004889708}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.75, y: -0.06000018, z: 0}
+  m_LocalPosition: {x: -0.75, y: -0.05, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4576173049965722}
@@ -460,13 +461,28 @@ CircleCollider2D:
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.12
---- !u!58 &58205561978255832
+--- !u!58 &58205525388025286
 CircleCollider2D:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1866686004889708}
   m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 0.32
+--- !u!58 &58205561978255832
+CircleCollider2D:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1866686004889708}
+  m_Enabled: 0
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 0
@@ -641,6 +657,7 @@ MonoBehaviour:
   m_MaxCapacity: 100
   m_MinScale: 1
   m_MaxScale: 3
+  m_Collider: {fileID: 58205561978255832}
 --- !u!212 &212016150652654412
 SpriteRenderer:
   m_ObjectHideFlags: 1

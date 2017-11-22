@@ -8,6 +8,10 @@ public class Sack : MonoBehaviour
     [SerializeField] private int m_MaxCapacity = 100;
     [SerializeField] private float m_MinScale = 1f;
     [SerializeField] private float m_MaxScale = 3f;
+    [SerializeField] private CircleCollider2D m_Collider;
+
+    private Vector2 m_ModelOffsetFromParent;
+    public Vector2 ModelOffset { get { return m_ModelOffsetFromParent; } }
 
     private int m_CurrentAmount = 0;
 
@@ -15,6 +19,8 @@ public class Sack : MonoBehaviour
 
     private void Start()
     {
+        m_ModelOffsetFromParent = m_CachedTransform.localPosition;
+
         Scale();
     }
 
@@ -46,5 +52,10 @@ public class Sack : MonoBehaviour
         localScale.y = newScale;
 
         m_CachedTransform.localScale = localScale;
+    }
+
+    public void Handle(bool carrying)
+    {
+        m_Collider.enabled = !carrying;
     }
 }
