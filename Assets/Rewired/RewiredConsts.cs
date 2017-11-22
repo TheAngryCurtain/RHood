@@ -1,5 +1,5 @@
 /* Rewired Constants
-   This list was generated on 11/22/2017 12:19:39 PM
+   This list was generated on 11/22/2017 5:14:31 PM
    The list applies to only the Rewired Input Manager from which it was generated.
    If you use a different Rewired Input Manager, you will have to generate a new list.
    If you make changes to the exported items in the Rewired Input Manager, you will need to regenerate this list.
@@ -26,6 +26,8 @@ namespace RewiredConsts {
         public const int Grapple = 7;
         [Rewired.Dev.ActionIdFieldInfo(categoryName = "Default", friendlyName = "Drop Sack")]
         public const int Drop_Sack = 9;
+        [Rewired.Dev.ActionIdFieldInfo(categoryName = "Default", friendlyName = "Interact")]
+        public const int Interact = 10;
     }
     public static class Category {
         public const int Default = 0;

@@ -47,13 +47,24 @@ public class PlayerController : MonoBehaviour
     private Arrow m_PrevGrappleArrow;
 
     private bool m_CanPickupSack = false;
+    private bool m_InBuilding = false;
+    private bool m_InDoorway = false;
+
+    // -------- WAY too many flags. Clean this up, please -----------------
 
     private void Awake()
     {
         InputManager.Instance.AddInputEventDelegate(OnInputRecieved, UpdateLoopType.Update);
 
+        VSEventManager.Instance.AddListener<GameEvents.BuildingChangeEvent>(OnBuildingChanged);
+
         Physics2D.IgnoreCollision(m_Sack.GetComponent<Collider2D>(), GetComponent<Collider2D>());
-        m_Sack.Handle(m_CarryingSack);
+        m_Sack.Handle(m_CarryingSack, 1f);
+    }
+
+    private void OnBuildingChanged(GameEvents.BuildingChangeEvent e)
+    {
+        m_InBuilding = e.Entered;
     }
 
     private void OnInputRecieved(InputActionEventData data)
@@ -82,6 +93,18 @@ public class PlayerController : MonoBehaviour
                 }
                 break;
 
+            // interact
+            case RewiredConsts.Action.Interact:
+                if (data.GetButtonDown())
+                {
+                    // entering doors
+                    if (m_InDoorway && !m_Grappling)
+                    {
+                        VSEventManager.Instance.TriggerEvent(new GameEvents.BuildingChangeEvent(!m_InBuilding));
+                    }
+                }
+                break;
+
             // shoot/grapple
             case RewiredConsts.Action.Shoot: // fall through
             case RewiredConsts.Action.Grapple:
@@ -103,10 +126,11 @@ public class PlayerController : MonoBehaviour
                 if (data.GetButtonDown())
                 {
                     GameObject sackObj = m_Sack.gameObject;
+                    float direction = Mathf.Sign(m_MovementX);
                     if (m_CarryingSack)
                     {
                         sackObj.transform.SetParent(null);
-                        m_Sack.Handle(false);
+                        m_Sack.Handle(false, direction);
                     }
                     else
                     {
@@ -116,7 +140,7 @@ public class PlayerController : MonoBehaviour
                             sackObj.transform.localPosition = m_Sack.ModelOffset;
                             sackObj.transform.localRotation = Quaternion.identity;
 
-                            m_Sack.Handle(true);
+                            m_Sack.Handle(true, direction);
                         }
                     }
                 }
@@ -388,6 +412,10 @@ public class PlayerController : MonoBehaviour
         {
             m_CanPickupSack = true;
         }
+        else if (collider.gameObject.layer == LayerMask.NameToLayer("Door"))
+        {
+            m_InDoorway = true;
+        }
     }
 
     private void OnTriggerExit2D(Collider2D collider)
@@ -395,6 +423,10 @@ public class PlayerController : MonoBehaviour
         if (collider.gameObject.layer == LayerMask.NameToLayer("Sack"))
         {
             m_CanPickupSack = false;
+        }
+        else if (collider.gameObject.layer == LayerMask.NameToLayer("Door"))
+        {
+            m_InDoorway = false;
         }
     }
 }

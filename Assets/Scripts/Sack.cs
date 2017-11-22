@@ -55,14 +55,14 @@ public class Sack : MonoBehaviour
         m_Rigidbody.mass = 0.05f + (m_CurrentAmount / 5f);
     }
 
-    public void Handle(bool holding)
+    public void Handle(bool holding, float direction)
     {
         m_Collider.enabled = !holding;
         m_Rigidbody.simulated = !holding;
 
         if (!holding)
         {
-            m_Rigidbody.AddTorque(m_Rigidbody.mass * 0.75f, ForceMode2D.Impulse);
+            m_Rigidbody.AddTorque(m_Rigidbody.mass * 0.65f * direction, ForceMode2D.Impulse);
         }
     }
 }
