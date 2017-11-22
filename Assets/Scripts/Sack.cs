@@ -62,6 +62,7 @@ public class Sack : MonoBehaviour
 
         if (!holding)
         {
+            m_Rigidbody.AddTorque(m_Rigidbody.mass * 0.75f, ForceMode2D.Impulse);
         }
     }
 }
