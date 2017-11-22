@@ -103,14 +103,10 @@ public class PlayerController : MonoBehaviour
                 if (data.GetButtonDown())
                 {
                     GameObject sackObj = m_Sack.gameObject;
-                    Rigidbody2D sackRb = sackObj.GetComponent<Rigidbody2D>();
-
-                    Debug.Log(m_CarryingSack);
-
                     if (m_CarryingSack)
                     {
                         sackObj.transform.SetParent(null);
-                        sackRb.simulated = true;
+                        m_Sack.Handle(false);
                     }
                     else
                     {
@@ -118,12 +114,11 @@ public class PlayerController : MonoBehaviour
                         {
                             sackObj.transform.SetParent(m_SackModelContainer);
                             sackObj.transform.localPosition = m_Sack.ModelOffset;
+                            sackObj.transform.localRotation = Quaternion.identity;
 
-                            sackRb.simulated = false;
+                            m_Sack.Handle(true);
                         }
                     }
-
-                    m_Sack.Handle(m_CarryingSack);
                 }
                 break;
 
