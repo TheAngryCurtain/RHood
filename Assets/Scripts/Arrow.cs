@@ -6,7 +6,6 @@ public class Arrow : MonoBehaviour
 {
     [SerializeField] private Rigidbody2D m_Rigidbody;
     [SerializeField] private TrailRenderer m_Trail;
-    [SerializeField] private float m_MinStickSpeed = 2f;
 
     private bool m_Launched = false;
     private float m_PrevRotation;
@@ -40,9 +39,19 @@ public class Arrow : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Debug.Log(m_Velocity.magnitude);
-        if (m_Velocity.magnitude > m_MinStickSpeed)
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Rope"))
         {
+            // cut the rope
+            HingeJoint2D joint = collision.gameObject.GetComponent<HingeJoint2D>();
+            if (joint != null)
+            {
+                joint.connectedBody = null;
+                joint.enabled = false;
+            }
+        }
+        else
+        {
+            //Debug.Log(m_Velocity.magnitude);
             m_Launched = false;
             m_Trail.enabled = false;
 
