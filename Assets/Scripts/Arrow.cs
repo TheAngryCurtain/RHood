@@ -4,13 +4,16 @@ using UnityEngine;
 
 public class Arrow : MonoBehaviour
 {
+    [SerializeField] private Transform m_CachedTransform;
     [SerializeField] private Rigidbody2D m_Rigidbody;
     [SerializeField] private TrailRenderer m_Trail;
+    [SerializeField] private LineRenderer m_RopeRenderer;
 
     private bool m_Launched = false;
     private float m_PrevRotation;
     private Vector2 m_Velocity;
     private System.Action<Rigidbody2D> m_GrappleCallback;
+    private Transform m_Owner;
 
     private void FixedUpdate()
     {
@@ -23,10 +26,19 @@ public class Arrow : MonoBehaviour
             float angle = Mathf.Atan2(m_Velocity.y, m_Velocity.x) * Mathf.Rad2Deg;
             m_Rigidbody.MoveRotation(angle);
         }
+
+        // update rope
+        if (m_GrappleCallback != null)
+        {
+            m_RopeRenderer.positionCount = 2;
+            m_RopeRenderer.SetPosition(0, m_Owner.position);
+            m_RopeRenderer.SetPosition(1, m_CachedTransform.position);
+        }
     }
 
-    public void Launch(Vector2 direction, float power, System.Action<Rigidbody2D> callback)
+    public void Launch(Vector2 direction, float power, Transform playerTransform, System.Action<Rigidbody2D> callback)
     {
+        m_Owner = playerTransform;
         m_Rigidbody.AddForce(direction * power, ForceMode2D.Impulse);
         m_Launched = true;
         m_Trail.enabled = true;
@@ -34,6 +46,7 @@ public class Arrow : MonoBehaviour
         if (callback != null)
         {
             m_GrappleCallback = callback;
+            m_RopeRenderer.enabled = true;
         }
     }
 
@@ -42,11 +55,14 @@ public class Arrow : MonoBehaviour
         if (collision.gameObject.layer == LayerMask.NameToLayer("Rope"))
         {
             // cut the rope
-            HingeJoint2D joint = collision.gameObject.GetComponent<HingeJoint2D>();
-            if (joint != null)
+            if (m_Rigidbody.velocity.magnitude > 5f)
             {
-                joint.connectedBody = null;
-                joint.enabled = false;
+                HingeJoint2D joint = collision.gameObject.GetComponent<HingeJoint2D>();
+                if (joint != null)
+                {
+                    joint.connectedBody = null;
+                    joint.enabled = false;
+                }
             }
         }
         else
@@ -61,6 +77,7 @@ public class Arrow : MonoBehaviour
 
             // restore the last rotation before the collision
             m_Rigidbody.MoveRotation(m_PrevRotation);
+            m_CachedTransform.SetParent(collision.transform);
 
             if (m_GrappleCallback != null)
             {
@@ -72,5 +89,17 @@ public class Arrow : MonoBehaviour
                 Destroy(this.gameObject, 5f);
             }
         }
+    }
+
+    public void CancelGrapple()
+    {
+        m_RopeRenderer.enabled = false;
+        m_GrappleCallback = null;
+    }
+
+    public void BreakGrapple()
+    {
+        m_RopeRenderer.enabled = false;
+        Destroy(this.gameObject, 5f);
     }
 }

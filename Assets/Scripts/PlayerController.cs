@@ -11,6 +11,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform m_AimTargetTransform;
     [SerializeField] private GameObject m_ArrowPrefab;
     [SerializeField] private Sack m_Sack;
+    [SerializeField] private DistanceJoint2D m_GrappleJoint;
 
     [SerializeField] private float m_DefaultMoveSpeed = 5f;
     [SerializeField] private float m_CrouchedMoveSpeed = 3f;
@@ -20,10 +21,13 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float m_AccelerationAirborne = 0.75f;
     [SerializeField] private float m_WallSlideVelocity = -1f;
     [SerializeField] private float m_ShootForce = 5f;
+    [SerializeField] private float m_WallJumpXForce = 5f;
+    [SerializeField] private float m_ClimbSpeed = 2f;
 
     private bool m_TouchingJumpableSurface { get { return m_SurfaceBelow || m_SurfaceLeft || m_SurfaceRight; } }
 
-    private float m_Movement;
+    private float m_MovementX;
+    private float m_MovementY;
     private float m_VelXSmooth;
     private bool m_RequestJump = false;
     private bool m_CancelJump = false;
@@ -37,23 +41,11 @@ public class PlayerController : MonoBehaviour
     private bool m_Aiming = false;
     private bool m_Grappling = false;
     private Vector3 m_TargetPos = Vector3.zero;
-
-    private int m_TotalGrapples = 0;
-    private List<GameObject> m_PrevGrappleArrows;
-    private List<DistanceJoint2D> m_GrappleJoints;
-    private List<LineRenderer> m_GrappleRenderers;
-
-    private Material m_GrappleMat;
+    private Arrow m_PrevGrappleArrow;
 
     private void Awake()
     {
         InputManager.Instance.AddInputEventDelegate(OnInputRecieved, UpdateLoopType.Update);
-
-        m_GrappleMat = new Material(Shader.Find("Sprites/Default"));
-
-        m_PrevGrappleArrows = new List<GameObject>();
-        m_GrappleJoints = new List<DistanceJoint2D>();
-        m_GrappleRenderers = new List<LineRenderer>();
     }
 
     private void OnInputRecieved(InputActionEventData data)
@@ -62,12 +54,23 @@ public class PlayerController : MonoBehaviour
         {
             // move
             case RewiredConsts.Action.Move_Horizontal:
-                m_Movement = 0f;
+                m_MovementX = 0f;
 
                 float h = data.GetAxis();
                 if (h != 0f)
                 {
-                    m_Movement = h * (m_Crouched ? m_CrouchedMoveSpeed : m_DefaultMoveSpeed);
+                    m_MovementX = h * (m_Crouched ? m_CrouchedMoveSpeed : m_DefaultMoveSpeed);
+                }
+                break;
+
+            // climb
+            case RewiredConsts.Action.Move_Vertical:
+                m_MovementY = 0f;
+
+                float v = data.GetAxis();
+                if (v != 0f)
+                {
+                    m_MovementY = v;
                 }
                 break;
 
@@ -140,10 +143,7 @@ public class PlayerController : MonoBehaviour
 
         if (m_Grappling)
         {
-            for (int i = 0; i < m_GrappleRenderers.Count; i++)
-            {
-                m_GrappleRenderers[i].SetPosition(1, m_CachedTransform.position);
-            }
+            Climb();
         }
         else if (!m_SurfaceBelow)
         {
@@ -154,26 +154,48 @@ public class PlayerController : MonoBehaviour
 
     private void Move()
     {
-        if (m_Rigidbody != null && !m_Grappling)
+        if (m_Rigidbody != null)
         {
             Vector2 velocity = m_Rigidbody.velocity;
-            
-            // block moving into a wall
-            float direction = Mathf.Sign(m_Movement);
-            if ((direction < 0f && !m_SurfaceLeft) || (direction > 0f && !m_SurfaceRight))
+            float direction = Mathf.Sign(m_MovementX);
+
+            if (!m_Grappling)
             {
-                float smoothTime = (m_TouchingJumpableSurface ? m_AccelerationGrounded : m_AccelerationAirborne);
-                velocity.x = Mathf.SmoothDamp(velocity.x, m_Movement, ref m_VelXSmooth, smoothTime);
+                // block moving into a wall
+                if ((direction < 0f && !m_SurfaceLeft) || (direction > 0f && !m_SurfaceRight))
+                {
+                    float smoothTime = m_AccelerationAirborne;
+                    //float modifiedMovement = m_MovementX;
+                    if (m_TouchingJumpableSurface)
+                    {
+                        smoothTime = m_AccelerationGrounded;
+                        //modifiedMovement = m_MovementX * (1f - m_Sack.WeightPercent);
+                    }
+
+                    //velocity.x = Mathf.SmoothDamp(velocity.x, modifiedMovement, ref m_VelXSmooth, smoothTime);
+                    velocity.x = Mathf.SmoothDamp(velocity.x, m_MovementX, ref m_VelXSmooth, smoothTime);
+
+                }
+                else
+                {
+                    // sliding down wall
+                    velocity.y = m_WallSlideVelocity;
+                }
             }
             else
             {
-                // sliding down wall
-                velocity.y = m_WallSlideVelocity;
+                // add momentum during swinging?
+                m_Rigidbody.AddForce(Vector2.right * m_MovementX * 0.5f * (1f - m_Sack.WeightPercent), ForceMode2D.Force);
             }
 
             FlipSprite(direction);
             m_Rigidbody.velocity = velocity;
         }
+    }
+
+    private void Climb()
+    {
+        m_GrappleJoint.distance -= m_MovementY * m_ClimbSpeed * (1f - m_Sack.WeightPercent) * Time.fixedDeltaTime;
     }
 
     private void FlipSprite(float direction)
@@ -194,10 +216,15 @@ public class PlayerController : MonoBehaviour
 
             Vector2 velocity = m_Rigidbody.velocity;
 
+            // wall jump
+            if (m_SurfaceLeft || m_SurfaceRight)
+            {
+                velocity.x += m_WallJumpXForce * -Mathf.Sign(m_MovementX);
+            }
+
             // account for sack weight
             float deltaVelocity = m_MaxJumpVelocity - m_MinJumpVelocity;
             float weightedVelocity = m_MaxJumpVelocity - (m_Sack.WeightPercent * deltaVelocity);
-
             velocity.y = weightedVelocity;
 
             Debug.LogFormat("weight %: {0}, weighted vel: {1}, min vel: {2}, max vel: {3}", m_Sack.WeightPercent, weightedVelocity, m_MinJumpVelocity, m_MaxJumpVelocity);
@@ -230,7 +257,7 @@ public class PlayerController : MonoBehaviour
             if (m_TargetPos != Vector3.zero)
             {
                 ShowAimTarget(true);
-                m_AimTargetTransform.localPosition = m_TargetPos;
+                m_AimTargetTransform.position = m_CachedTransform.position + m_TargetPos;
             }
             else
             {
@@ -243,19 +270,28 @@ public class PlayerController : MonoBehaviour
     {
         GameObject arrowObj = (GameObject)Instantiate(m_ArrowPrefab, null);
         arrowObj.transform.position = m_AimTargetTransform.position;
-        m_PrevGrappleArrows.Add(arrowObj);
-
         Arrow arrow = arrowObj.GetComponent<Arrow>();
         if (arrow != null)
         {
             System.Action<Rigidbody2D> callback = null;
             if (grapple)
             {
+                if (m_Grappling)
+                {
+                    CancelGrapple();
+                }
+
+                if (m_PrevGrappleArrow != null)
+                {
+                    m_PrevGrappleArrow.CancelGrapple();
+                }
+
                 callback = OnGrappleArrowLanded;
+                m_PrevGrappleArrow = arrow;
             }
 
             Vector3 direction = (m_AimTargetTransform.position - m_CachedTransform.position).normalized;
-            arrow.Launch(direction, m_ShootForce, callback);
+            arrow.Launch(direction, m_ShootForce, m_CachedTransform, callback);
 
             // push player back
             m_Rigidbody.AddForce(-direction * 2f, ForceMode2D.Impulse);
@@ -269,86 +305,35 @@ public class PlayerController : MonoBehaviour
             CancelGrapple();
         }
 
-        //Vector3 arrowPos = arrowRb.transform.position;
-        //m_GrappleJoint.distance = (arrowPos - m_CachedTransform.position).magnitude;
-        //m_GrappleJoint.connectedBody = arrowRb;
-        //m_GrappleJoint.enabled = true;
-
-        //// set static end of line
-        //m_GrappleRenderer.enabled = true;
-        //m_GrappleRenderer.positionCount = 2;
-        //m_GrappleRenderer.SetPosition(0, arrowPos);
-        //m_GrappleRenderer.SetPosition(1, m_CachedTransform.position);
-
         BuildGrapple(arrowRb);
-        m_TotalGrapples += 1;
-
-        Debug.LogFormat("Adding Grapple: {0}", m_TotalGrapples);
-
         m_Grappling = true;
     }
 
     private void BuildGrapple(Rigidbody2D connectedBody)
     {
         // build joint
-        DistanceJoint2D joint = this.gameObject.AddComponent<DistanceJoint2D>();
-        joint.enableCollision = true;
-        joint.maxDistanceOnly = true;
-
-        joint.distance = (connectedBody.transform.position - m_CachedTransform.position).magnitude;
-        joint.connectedBody = connectedBody;
-        joint.enabled = true;
-
-        m_GrappleJoints.Add(joint);
-
-        GameObject renderContainer = new GameObject("Rope");
-        renderContainer.transform.SetParent(m_CachedTransform);
+        m_GrappleJoint.distance = (connectedBody.transform.position - m_CachedTransform.position).magnitude;
+        m_GrappleJoint.connectedBody = connectedBody;
+        m_GrappleJoint.enabled = true;
 
         // build line renderer
-        LineRenderer renderer = renderContainer.AddComponent<LineRenderer>();
-        renderer.material = m_GrappleMat;
-        renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-        renderer.receiveShadows = false;
-        renderer.useWorldSpace = true;
-
-        AnimationCurve widthCurve = new AnimationCurve();
-        widthCurve.AddKey(0, 0.1f);
-        widthCurve.AddKey(1, 0.1f);
-        renderer.widthCurve = widthCurve;
-
-        renderer.startColor = new Color(0.486f, 0.192f, 0.192f, 1f);
-        renderer.endColor = new Color(0.486f, 0.192f, 0.192f, 1f);
-
-        renderer.enabled = true;
-        renderer.positionCount = 2;
-        renderer.SetPosition(0, connectedBody.transform.position);
-        renderer.SetPosition(1, m_CachedTransform.position);
-
-        m_GrappleRenderers.Add(renderer);
+        //m_GrappleRenderer.enabled = true;
+        //m_GrappleRenderer.positionCount = 2;
+        //m_GrappleRenderer.SetPosition(0, connectedBody.transform.position);
+        //m_GrappleRenderer.SetPosition(1, m_CachedTransform.position);
     }
 
     private void CancelGrapple()
     {
-        if (m_PrevGrappleArrows.Count > 0)
+        if (m_PrevGrappleArrow != null)
         {
-            Destroy(m_PrevGrappleArrows[0], 5f);
-            Destroy(m_GrappleJoints[0]);
-            Destroy(m_GrappleRenderers[0].gameObject);
-
-            m_PrevGrappleArrows.RemoveAt(0);
-            m_GrappleJoints.RemoveAt(0);
-            m_GrappleRenderers.RemoveAt(0);
-
-            m_TotalGrapples -= 1;
-
-            Debug.LogFormat("Removing Grapple: {0}", m_TotalGrapples);
+            m_PrevGrappleArrow.BreakGrapple();
         }
 
-        //m_GrappleJoint.connectedBody = null;
-        //m_GrappleJoint.enabled = false;
+        m_GrappleJoint.connectedBody = null;
+        m_GrappleJoint.enabled = false;
 
         m_Grappling = false;
-        //m_GrappleRenderer.enabled = false;
     }
 
     private void ShowAimTarget(bool show)
