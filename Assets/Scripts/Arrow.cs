@@ -88,6 +88,13 @@ public class Arrow : MonoBehaviour
         }
         else
         {
+            m_RopeRenderer.positionCount = 2;
+            m_RopeRenderer.SetPosition(0, m_Owner.position);
+            m_RopeRenderer.SetPosition(1, m_CachedTransform.position);
+        }
+        /*
+        else
+        {
             // pull rope taught
             m_OwnerToArrowAnchor = m_CachedTransform.position - m_Owner.position;
 
@@ -129,6 +136,7 @@ public class Arrow : MonoBehaviour
                 m_RopeRenderer.SetPosition(1, m_CachedTransform.position);
             }
         }
+        */
     }
 
     public void Launch(Vector2 direction, float power, Transform playerTransform, System.Action callback)

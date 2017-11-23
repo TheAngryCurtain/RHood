@@ -3,43 +3,24 @@ using System.Collections.Generic;
 using UnityEngine;
 using Rewired;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : Controller
 {
-    [SerializeField] private Transform m_CachedTransform;
-    [SerializeField] private Rigidbody2D m_Rigidbody;
-    [SerializeField] private Transform m_ModelContainer;
     [SerializeField] private Transform m_AimTargetTransform;
-    [SerializeField] private GameObject m_ArrowPrefab;
     [SerializeField] private Sack m_Sack;
     [SerializeField] private Transform m_SackModelContainer;
 
-    [SerializeField] private float m_DefaultMoveSpeed = 5f;
     [SerializeField] private float m_CrouchedMoveSpeed = 3f;
-    [SerializeField] private float m_MaxJumpVelocity = 6f;
-    [SerializeField] private float m_MinJumpVelocity = 2f;
-    [SerializeField] private float m_AccelerationGrounded = 0.5f;
-    [SerializeField] private float m_AccelerationAirborne = 0.75f;
     [SerializeField] private float m_WallSlideVelocity = -1f;
-    [SerializeField] private float m_ShootForce = 5f;
     [SerializeField] private float m_WallJumpXForce = 5f;
     [SerializeField] private float m_ClimbSpeed = 2f;
 
-    private bool m_TouchingJumpableSurface { get { return m_SurfaceBelow || m_SurfaceLeft || m_SurfaceRight; } }
     private bool m_CarryingSack { get { return m_Sack.transform.parent == m_SackModelContainer; } }
     private float m_SackWeightModifier { get { return m_CarryingSack ? 1f - m_Sack.WeightPercent : 1f; } }
     private float m_SackWeightPercent { get { return m_CarryingSack ? m_Sack.WeightPercent : 0f; } }
 
-    private float m_MovementX;
     private float m_MovementY;
-    private float m_VelXSmooth;
-    private bool m_RequestJump = false;
     private bool m_CancelJump = false;
     private bool m_Crouched = false;
-
-    private bool m_SurfaceBelow = false;
-    private bool m_SurfaceLeft = false;
-    private bool m_SurfaceRight = false;
-    private bool m_SurfaceAbove = false;
 
     private bool m_Aiming = false;
     private bool m_Grappling = false;
@@ -49,8 +30,6 @@ public class PlayerController : MonoBehaviour
     private bool m_CanPickupSack = false;
     private bool m_InBuilding = false;
     private bool m_InDoorway = false;
-
-    // -------- WAY too many flags. Clean this up, please -----------------
 
     private void Awake()
     {
@@ -117,7 +96,7 @@ public class PlayerController : MonoBehaviour
                     ShowAimTarget(false);
                     m_Aiming = false;
 
-                    Shoot(data.actionId == RewiredConsts.Action.Grapple);
+                    PrepareShoot(data.actionId == RewiredConsts.Action.Grapple);
                 }
                 break;
 
@@ -192,8 +171,8 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Move();
-        Jump();
+        PrepareMove();
+        PrepareJump();
         CancelJump();
         Aim();
 
@@ -208,45 +187,51 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void Move()
+    private Vector2 GetMoveVelocity()
     {
-        if (m_Rigidbody != null)
+        Vector2 velocity = m_Rigidbody.velocity;
+        float direction = Mathf.Sign(m_MovementX);
+
+        // block moving into a wall
+        if ((direction < 0f && !m_SurfaceLeft) || (direction > 0f && !m_SurfaceRight))
         {
-            Vector2 velocity = m_Rigidbody.velocity;
-            float direction = Mathf.Sign(m_MovementX);
-
-            if (!m_Grappling)
+            float smoothTime = m_AccelerationAirborne;
+            //float modifiedMovement = m_MovementX;
+            if (m_TouchingJumpableSurface)
             {
-                // block moving into a wall
-                if ((direction < 0f && !m_SurfaceLeft) || (direction > 0f && !m_SurfaceRight))
-                {
-                    float smoothTime = m_AccelerationAirborne;
-                    //float modifiedMovement = m_MovementX;
-                    if (m_TouchingJumpableSurface)
-                    {
-                        smoothTime = m_AccelerationGrounded;
-                        //modifiedMovement = m_MovementX * m_SackWeightModifier;
-                    }
-
-                    //velocity.x = Mathf.SmoothDamp(velocity.x, modifiedMovement, ref m_VelXSmooth, smoothTime);
-                    velocity.x = Mathf.SmoothDamp(velocity.x, m_MovementX, ref m_VelXSmooth, smoothTime);
-
-                }
-                else
-                {
-                    // sliding down wall
-                    velocity.y = m_WallSlideVelocity;
-                }
-            }
-            else
-            {
-                // add momentum during swinging?
-                m_Rigidbody.AddForce(Vector2.right * m_MovementX * 0.5f * m_SackWeightModifier, ForceMode2D.Force);
+                smoothTime = m_AccelerationGrounded;
+                //modifiedMovement = m_MovementX * m_SackWeightModifier;
             }
 
-            FlipSprite(direction);
-            m_Rigidbody.velocity = velocity;
+            //velocity.x = Mathf.SmoothDamp(velocity.x, modifiedMovement, ref m_VelXSmooth, smoothTime);
+            velocity.x = Mathf.SmoothDamp(velocity.x, m_MovementX, ref m_VelXSmooth, smoothTime);
+
         }
+        else
+        {
+            // sliding down wall
+            velocity.y = m_WallSlideVelocity;
+        }
+
+        return velocity;
+    }
+
+    private void PrepareMove()
+    {
+        Vector2 velocity = m_Rigidbody.velocity;
+        float direction = Mathf.Sign(m_MovementX);
+
+        if (!m_Grappling)
+        {
+            velocity = GetMoveVelocity();
+        }
+        else
+        {
+            // add momentum during swinging?
+            m_Rigidbody.AddForce(Vector2.right * m_MovementX * 0.5f * m_SackWeightModifier, ForceMode2D.Force);
+        }
+
+        Move(velocity);
     }
 
     private void Climb()
@@ -254,16 +239,29 @@ public class PlayerController : MonoBehaviour
         m_PrevGrappleArrow.Reel(m_MovementY * m_ClimbSpeed * m_SackWeightModifier);
     }
 
-    private void FlipSprite(float direction)
+    private Vector2 GetJumpVelocity()
     {
-        Vector3 localScale = m_ModelContainer.localScale;
-        localScale.x = (direction < 0f ? -1 : 1);
-        m_ModelContainer.localScale = localScale;
+        Vector2 velocity = m_Rigidbody.velocity;
+        // wall jump
+        if (m_SurfaceLeft || m_SurfaceRight)
+        {
+            velocity.x += m_WallJumpXForce * -Mathf.Sign(m_MovementX);
+        }
+
+        // account for sack weight
+        float deltaVelocity = m_MaxJumpVelocity - m_MinJumpVelocity;
+        float weightedVelocity = m_MaxJumpVelocity - (m_SackWeightPercent * deltaVelocity);
+        velocity.y = weightedVelocity;
+
+        Debug.LogFormat("weight %: {0}, weighted vel: {1}, min vel: {2}, max vel: {3}", m_SackWeightPercent, weightedVelocity, m_MinJumpVelocity, m_MaxJumpVelocity);
+
+        return velocity;
     }
 
-    private void Jump()
+    private void PrepareJump()
     {
-        if ((m_TouchingJumpableSurface || m_Grappling) && m_RequestJump)
+        m_CanJump = (m_TouchingJumpableSurface || m_Grappling);
+        if (m_CanJump && m_RequestJump)
         {
             if (m_Grappling)
             {
@@ -271,23 +269,8 @@ public class PlayerController : MonoBehaviour
                 m_Grappling = false;
             }
 
-            Vector2 velocity = m_Rigidbody.velocity;
-
-            // wall jump
-            if (m_SurfaceLeft || m_SurfaceRight)
-            {
-                velocity.x += m_WallJumpXForce * -Mathf.Sign(m_MovementX);
-            }
-
-            // account for sack weight
-            float deltaVelocity = m_MaxJumpVelocity - m_MinJumpVelocity;
-            float weightedVelocity = m_MaxJumpVelocity - (m_SackWeightPercent * deltaVelocity);
-            velocity.y = weightedVelocity;
-
-            Debug.LogFormat("weight %: {0}, weighted vel: {1}, min vel: {2}, max vel: {3}", m_SackWeightPercent, weightedVelocity, m_MinJumpVelocity, m_MaxJumpVelocity);
-
-            m_Rigidbody.velocity = velocity;
-            m_RequestJump = false;
+            Vector2 velocity = GetJumpVelocity();
+            Jump(velocity);
             m_Crouched = false;
         }
     }
@@ -323,66 +306,33 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void Shoot(bool grapple)
+    private void PrepareShoot(bool grapple)
     {
-        GameObject arrowObj = (GameObject)Instantiate(m_ArrowPrefab, null);
-        arrowObj.transform.position = m_AimTargetTransform.position;
-        Arrow arrow = arrowObj.GetComponent<Arrow>();
-        if (arrow != null)
+        System.Action callback = null;
+        if (grapple)
         {
-            System.Action callback = null;
-            if (grapple)
+            if (m_Grappling)
             {
-                if (m_Grappling)
-                {
-                    m_PrevGrappleArrow.BreakGrapple();
-                    m_PrevGrappleArrow = null;
-                }
-
-                if (m_PrevGrappleArrow != null)
-                {
-                    m_PrevGrappleArrow.CancelGrapple();
-                }
-
-                callback = () => { m_Grappling = true; };
-                m_PrevGrappleArrow = arrow;
+                m_PrevGrappleArrow.BreakGrapple();
+                m_PrevGrappleArrow = null;
             }
 
-            Vector3 direction = (m_AimTargetTransform.position - m_CachedTransform.position).normalized;
-            arrow.Launch(direction, m_ShootForce, m_CachedTransform, callback);
+            if (m_PrevGrappleArrow != null)
+            {
+                m_PrevGrappleArrow.CancelGrapple();
+            }
 
-            // push player back
-            m_Rigidbody.AddForce(-direction * 2f, ForceMode2D.Impulse);
+            callback = () => { m_Grappling = true; };
         }
+
+        Vector3 direction = (m_AimTargetTransform.position - m_CachedTransform.position).normalized;
+        Arrow arrow = Shoot(direction, callback);
+        m_PrevGrappleArrow = arrow;
     }
 
     private void ShowAimTarget(bool show)
     {
         m_AimTargetTransform.gameObject.SetActive(show);
-    }
-
-    public void HandleTriggerCollision(eCollisionZone zone, bool enter)
-    {
-        switch (zone)
-        {
-            case eCollisionZone.Below:
-                m_SurfaceBelow = enter;
-                break;
-
-            case eCollisionZone.Above:
-                m_SurfaceAbove = enter;
-                break;
-
-            case eCollisionZone.Left:
-                m_SurfaceLeft = enter;
-                break;
-
-            case eCollisionZone.Right:
-                m_SurfaceRight = enter;
-                break;
-        }
-
-        //Debug.LogFormat("Zone: {0}, Enter: {1}", zone, enter);
     }
 
     private void OnTriggerEnter2D(Collider2D collider)
