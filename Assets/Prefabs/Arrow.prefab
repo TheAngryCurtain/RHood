@@ -285,6 +285,7 @@ MonoBehaviour:
   m_Trail: {fileID: 96166888617240422}
   m_RopeJoint: {fileID: 232010265850238844}
   m_RopeRenderer: {fileID: 120277560415772622}
+  m_RecordInterval: 0.1
 --- !u!120 &120277560415772622
 LineRenderer:
   m_ObjectHideFlags: 1
