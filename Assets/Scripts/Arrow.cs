@@ -150,22 +150,6 @@ public class Arrow : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        //if (collision.gameObject.layer == LayerMask.NameToLayer("Rope"))
-        //{
-        //    // cut the rope
-        //    if (m_Rigidbody.velocity.magnitude > 5f)
-        //    {
-        //        HingeJoint2D joint = collision.gameObject.GetComponent<HingeJoint2D>();
-        //        if (joint != null)
-        //        {
-        //            joint.connectedBody = null;
-        //            joint.enabled = false;
-        //        }
-        //    }
-        //}
-        //else
-        //{
-            //Debug.Log(m_Velocity.magnitude);
         m_Launched = false;
         m_Trail.enabled = false;
 
@@ -181,11 +165,10 @@ public class Arrow : MonoBehaviour
             SetGrapple(collision.gameObject);
             m_GrappleCallback();
         }
-        else
-        {
-            // TODO change this to when arrows go off screen
-            Destroy(this.gameObject, 5f);
-        }
+        //else
+        //{
+        //    // TODO change this to when arrows go off screen
+        //    Destroy(this.gameObject, 5f);
         //}
     }
 
@@ -217,6 +200,6 @@ public class Arrow : MonoBehaviour
         m_RopeJoint.connectedBody = null;
         m_RopeJoint.enabled = false;
 
-        Destroy(this.gameObject, 5f);
+        //Destroy(this.gameObject, 5f);
     }
 }

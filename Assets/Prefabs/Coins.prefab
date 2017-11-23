@@ -173,8 +173,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a27536527a91e144afc29d5753b574b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Value: 5
+  m_CachedTransform: {fileID: 4479988428272734}
   m_Rigidbody: {fileID: 50958076364163410}
+  m_Value: 5
   m_RejectForce: 1
   m_RejectTorque: 2
 --- !u!212 &212781467664676452
