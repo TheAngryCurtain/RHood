@@ -614,6 +614,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Controller: {fileID: 114193678580042980}
   m_Zone: 0
+  m_CollisionMask:
+    serializedVersion: 2
+    m_Bits: 66048
 --- !u!114 &114193678580042980
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -656,6 +659,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Controller: {fileID: 114193678580042980}
   m_Zone: 1
+  m_CollisionMask:
+    serializedVersion: 2
+    m_Bits: 66048
 --- !u!114 &114403570449512722
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -669,6 +675,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Controller: {fileID: 114193678580042980}
   m_Zone: 3
+  m_CollisionMask:
+    serializedVersion: 2
+    m_Bits: 66048
 --- !u!114 &114575807020933272
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -682,6 +691,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Controller: {fileID: 114193678580042980}
   m_Zone: 2
+  m_CollisionMask:
+    serializedVersion: 2
+    m_Bits: 66048
 --- !u!114 &114781168424062504
 MonoBehaviour:
   m_ObjectHideFlags: 1
