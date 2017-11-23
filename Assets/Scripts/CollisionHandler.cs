@@ -6,7 +6,7 @@ public enum eCollisionZone { Below, Above, Left, Right }
 
 public class CollisionHandler : MonoBehaviour
 {
-    [SerializeField] private PlayerController m_Controller;
+    [SerializeField] private Controller m_Controller;
     [SerializeField] private eCollisionZone m_Zone;
     [SerializeField] private LayerMask m_CollisionMask;
 

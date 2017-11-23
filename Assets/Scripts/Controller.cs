@@ -8,6 +8,7 @@ public class Controller : MonoBehaviour
     [SerializeField] protected Rigidbody2D m_Rigidbody;
     [SerializeField] protected Transform m_ModelContainer;
     [SerializeField] protected GameObject m_ArrowPrefab;
+    [SerializeField] protected Collider2D m_Collider;
 
     [SerializeField] protected float m_DefaultMoveSpeed = 5f;
     [SerializeField] protected float m_MaxJumpVelocity = 6f;
