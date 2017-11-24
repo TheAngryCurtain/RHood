@@ -30,13 +30,17 @@ public class Controller : MonoBehaviour
     protected float m_MovementX;
     protected float m_VelXSmooth;
     protected bool m_RequestJump = false;
-
+    protected float m_FacingDirection;
 
     protected void Move(Vector2 velocity)
     {
         float direction = Mathf.Sign(m_MovementX);
+        if (m_MovementX != 0f)
+        {
+            m_FacingDirection = direction;
+        }
 
-        FlipSprite(direction);
+        FlipSprite(m_FacingDirection);
         m_Rigidbody.velocity = velocity;
     }
 

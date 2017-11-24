@@ -80,11 +80,12 @@ public class AIController : Controller
                     }
 
                     // look for suspicious things
-                    m_HitInfo = Physics2D.Raycast(m_CachedTransform.position, m_CachedTransform.right * Mathf.Sign(m_MovementX), m_MaxLookDistance);
+                    Debug.DrawLine(m_CachedTransform.position, m_CachedTransform.position + m_CachedTransform.right * m_MaxLookDistance * m_FacingDirection, Color.red);
+                    m_HitInfo = Physics2D.Raycast(m_CachedTransform.position, m_CachedTransform.right * m_FacingDirection, m_MaxLookDistance);
                     if (m_HitInfo.collider != null && m_HitInfo.collider != m_Collider && CollisionHandler.LayerInLayerMask(m_HitInfo.collider.gameObject.layer, m_SuspicionMask))
                     {
-                        Debug.Log(m_HitInfo.collider.name);
                         m_GeneralAlarmTime += Time.fixedDeltaTime;
+                        Debug.LogFormat("time: {0}", m_GeneralAlarmTime);
                         if (m_GeneralAlarmTime > m_TimeToCaution)
                         {
                             m_GeneralAlarmTime = 0f;
