@@ -21,7 +21,7 @@ public class AIController : Controller
     private Vector2 m_TargetPosition;
 
     private float m_DecisionTime = 0f;
-    private float m_WaitTime = 0f;
+    private bool m_WaitTurn = false;
     private float m_Time = 0f;
 
     RaycastHit2D m_HitInfo;
@@ -52,30 +52,32 @@ public class AIController : Controller
                 // wander
                 if (m_SurfaceBelow)
                 {
-
-                    // THIS ISN'T RIGHT. FIX IT PLEASE.
-
-                    if (Time.time < m_Time + m_WaitTime)
-                    {
-                        Debug.Log("Waiting...");
-                        return;
-                    }
-
                     if (Time.time > m_Time + m_DecisionTime)
                     {
                         m_Time = Time.time;
-                        m_DecisionTime = UnityEngine.Random.Range(1f, 3f);
+                        m_DecisionTime = UnityEngine.Random.Range(2f, 4f);
 
                         float direction = (UnityEngine.Random.Range(-1f, 1f) < 0f ? -1 : 1);
                         m_MovementX = direction * m_DefaultMoveSpeed;
 
-                        Debug.LogFormat("decision time: {0}, wait time: {1}", m_DecisionTime, m_WaitTime);
+                        // toggle whether you're waiting or not
+                        m_WaitTurn = !m_WaitTurn;
+                        Debug.LogFormat("decision time: {0}, waiting? {1}", m_DecisionTime, m_WaitTurn);
                     }
 
-                    Vector2 velocity = m_Rigidbody.velocity;
-                    float smoothTime = m_AccelerationGrounded;
-                    velocity.x = Mathf.SmoothDamp(velocity.x, m_MovementX, ref m_VelXSmooth, smoothTime);
-                    Move(velocity);
+                    // flip direction if you hit a wall
+                    if ((m_SurfaceRight && Mathf.Sign(m_MovementX) > 0) || (m_SurfaceLeft && Mathf.Sign(m_MovementX) < 0f))
+                    {
+                        m_MovementX *= -1f;
+                    }
+
+                    if (!m_WaitTurn)
+                    {
+                        Vector2 velocity = m_Rigidbody.velocity;
+                        float smoothTime = m_AccelerationGrounded;
+                        velocity.x = Mathf.SmoothDamp(velocity.x, m_MovementX, ref m_VelXSmooth, smoothTime);
+                        Move(velocity);
+                    }
 
                     // look for suspicious things
                     m_HitInfo = Physics2D.Raycast(m_CachedTransform.position, m_CachedTransform.right * Mathf.Sign(m_MovementX), m_MaxLookDistance);
