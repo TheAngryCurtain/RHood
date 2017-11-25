@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -165,16 +165,20 @@ public class Arrow : MonoBehaviour
         m_Rigidbody.angularVelocity = 0f;
         m_Rigidbody.isKinematic = true;
 
-        // restore the last rotation before the collision
+        // parent it to the hit object
+        //m_CachedTransform.SetParent(collision.transform); put this back in later when things have the proper scale (1)
 
         if (m_GrappleCallback != null)
         {
+            // line up with the normal
             m_CachedTransform.right = -collision.contacts[0].normal;
+
             SetGrapple(collision.gameObject);
             m_GrappleCallback();
         }
         else
         {
+            // restore the last rotation before the collision
             m_Rigidbody.MoveRotation(m_PrevRotation);
         }
         //else

@@ -5,7 +5,7 @@ using Rewired;
 
 public class PlayerController : Controller
 {
-    [SerializeField] private Transform m_AimTargetTransform;
+    //[SerializeField] private Transform m_AimTargetTransform;
     [SerializeField] private Sack m_Sack;
     [SerializeField] private Transform m_SackModelContainer;
     [SerializeField] private GameObject m_GrappleArrowPrefab;
@@ -23,7 +23,6 @@ public class PlayerController : Controller
     private bool m_CancelJump = false;
     private bool m_Crouched = false;
 
-    private bool m_Aiming = false;
     private bool m_Grappling = false;
     private Vector3 m_TargetPos = Vector3.zero;
     private Arrow m_PrevGrappleArrow;
@@ -170,12 +169,23 @@ public class PlayerController : Controller
         }
     }
 
+#if UNITY_EDITOR
+    private void OnGUI()
+    {
+        GUI.Label(new Rect(10, 0, 300, 30), "Velocity: " + m_Rigidbody.velocity);
+        GUI.Label(new Rect(10, 10, 300, 30), "Surface Below: " + m_SurfaceBelow);
+        GUI.Label(new Rect(10, 20, 300, 30), "Surface Above: " + m_SurfaceAbove);
+        GUI.Label(new Rect(10, 30, 300, 30), "Surface Left: " + m_SurfaceLeft);
+        GUI.Label(new Rect(10, 40, 300, 30), "Surface Right: " + m_SurfaceRight);
+    }
+#endif
+
     private void FixedUpdate()
     {
         PrepareMove();
         PrepareJump();
         CancelJump();
-        Aim();
+        Aim(m_TargetPos);
 
         if (m_Grappling)
         {
@@ -220,7 +230,7 @@ public class PlayerController : Controller
     private void PrepareMove()
     {
         Vector2 velocity = m_Rigidbody.velocity;
-        float direction = Mathf.Sign(m_MovementX);
+        //float direction = Mathf.Sign(m_MovementX);
 
         if (!m_Grappling)
         {
@@ -291,21 +301,23 @@ public class PlayerController : Controller
         }
     }
 
-    private void Aim()
-    {
-        if (m_Aiming)
-        {
-            if (m_TargetPos != Vector3.zero)
-            {
-                ShowAimTarget(true);
-                m_AimTargetTransform.position = m_CachedTransform.position + m_TargetPos;
-            }
-            else
-            {
-                ShowAimTarget(false);
-            }
-        }
-    }
+    //private void PrepareAim()
+    //{
+        //if (m_Aiming)
+        //{
+        //    if (m_TargetPos != Vector3.zero)
+        //    {
+        //        ShowAimTarget(true);
+        //        m_AimTargetTransform.position = m_CachedTransform.position + m_TargetPos;
+        //    }
+        //    else
+        //    {
+        //        ShowAimTarget(false);
+        //    }
+
+        //    Aim(m_TargetPos - m_CachedTransform.position);
+        //}
+    //}
 
     private void PrepareShoot(bool grapple)
     {
@@ -330,14 +342,14 @@ public class PlayerController : Controller
             callback = () => { m_Grappling = true; };
         }
 
-        Vector3 direction = (m_AimTargetTransform.position - m_CachedTransform.position).normalized;
-        Arrow arrow = Shoot(direction, callback);
+        //Vector3 direction = (m_AimTargetTransform.position - m_CachedTransform.position).normalized;
+        Arrow arrow = Shoot(m_AimDirection, callback);
         m_PrevGrappleArrow = arrow;
     }
 
     private void ShowAimTarget(bool show)
     {
-        m_AimTargetTransform.gameObject.SetActive(show);
+        //m_AimTargetTransform.gameObject.SetActive(show);
     }
 
     private void OnTriggerEnter2D(Collider2D collider)

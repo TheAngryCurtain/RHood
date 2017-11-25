@@ -9,6 +9,7 @@ public class Controller : MonoBehaviour
     [SerializeField] protected Transform m_ModelContainer;
     [SerializeField] protected GameObject m_ArrowPrefab;
     [SerializeField] protected Collider2D m_Collider;
+    [SerializeField] protected GameObject m_BowObj;
 
     [SerializeField] protected float m_DefaultMoveSpeed = 5f;
     [SerializeField] protected float m_MaxJumpVelocity = 6f;
@@ -32,6 +33,8 @@ public class Controller : MonoBehaviour
     protected float m_VelXSmooth;
     protected bool m_RequestJump = false;
     protected float m_FacingDirection;
+    protected bool m_Aiming = false;
+    protected Vector3 m_AimDirection;
 
     protected void Move(Vector2 velocity)
     {
@@ -41,7 +44,11 @@ public class Controller : MonoBehaviour
             m_FacingDirection = direction;
         }
 
-        FlipSprite(m_FacingDirection);
+        if (!m_Aiming)
+        {
+            FlipSprite(m_FacingDirection);
+        }
+
         m_Rigidbody.velocity = velocity;
     }
 
@@ -51,6 +58,25 @@ public class Controller : MonoBehaviour
         {
             m_Rigidbody.velocity = velocity;
             m_RequestJump = false;
+        }
+    }
+
+    protected void Aim(Vector3 localDirection)
+    {
+        // activate bow
+        if (m_BowObj.activeSelf != m_Aiming)
+        {
+            m_BowObj.SetActive(m_Aiming);
+        }
+
+        if (m_Aiming)
+        {
+            m_AimDirection = (m_CachedTransform.TransformPoint(localDirection) - m_CachedTransform.position).normalized;
+            m_BowObj.transform.right = m_AimDirection;
+
+            // face the way you're aiming
+            m_FacingDirection = (localDirection.x < 0 ? -1 : 1);
+            FlipSprite(m_FacingDirection);
         }
     }
 
@@ -65,6 +91,8 @@ public class Controller : MonoBehaviour
 
             // push player back
             m_Rigidbody.AddForce(-direction * 2f, ForceMode2D.Impulse);
+
+            m_Aiming = false;
         }
 
         return arrow;
