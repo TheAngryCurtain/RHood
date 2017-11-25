@@ -8,6 +8,7 @@ public class PlayerController : Controller
     [SerializeField] private Transform m_AimTargetTransform;
     [SerializeField] private Sack m_Sack;
     [SerializeField] private Transform m_SackModelContainer;
+    [SerializeField] private GameObject m_GrappleArrowPrefab;
 
     [SerializeField] private float m_CrouchedMoveSpeed = 3f;
     [SerializeField] private float m_WallSlideVelocity = -1f;
@@ -308,9 +309,13 @@ public class PlayerController : Controller
 
     private void PrepareShoot(bool grapple)
     {
+        m_ActiveArrowObj = m_ArrowPrefab;
+
         System.Action callback = null;
         if (grapple)
         {
+            m_ActiveArrowObj = m_GrappleArrowPrefab;
+
             if (m_Grappling)
             {
                 m_PrevGrappleArrow.BreakGrapple();

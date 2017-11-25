@@ -21,6 +21,7 @@ public class Controller : MonoBehaviour
 
     // this is a shared bool that should be set by a child class before actually jumping
     protected bool m_CanJump = false;
+    protected GameObject m_ActiveArrowObj;
 
     protected bool m_SurfaceBelow = false;
     protected bool m_SurfaceLeft = false;
@@ -55,7 +56,7 @@ public class Controller : MonoBehaviour
 
     protected Arrow Shoot(Vector3 direction, System.Action ArrowLandedCallback)
     {
-        GameObject arrowObj = (GameObject)Instantiate(m_ArrowPrefab, null);
+        GameObject arrowObj = (GameObject)Instantiate(m_ActiveArrowObj, null);
         arrowObj.transform.position = m_CachedTransform.position;
         Arrow arrow = arrowObj.GetComponent<Arrow>();
         if (arrow != null)

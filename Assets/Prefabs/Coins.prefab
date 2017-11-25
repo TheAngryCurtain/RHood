@@ -136,7 +136,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.35
+  m_Radius: 0.71
 --- !u!61 &61029325287995154
 BoxCollider2D:
   m_ObjectHideFlags: 1
@@ -160,7 +160,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.38, y: 0.33}
+  m_Size: {x: 0.64, y: 1.02}
   m_EdgeRadius: 0
 --- !u!114 &114382425477965370
 MonoBehaviour:
@@ -210,7 +210,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300006, guid: e5cf9c3bdf42b574a9d9e48102b74ac5, type: 3}
+  m_Sprite: {fileID: 21300048, guid: e60a0b6802b23c148a40ffa82196f90e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

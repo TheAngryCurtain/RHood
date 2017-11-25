@@ -166,12 +166,16 @@ public class Arrow : MonoBehaviour
         m_Rigidbody.isKinematic = true;
 
         // restore the last rotation before the collision
-        m_Rigidbody.MoveRotation(m_PrevRotation);
 
         if (m_GrappleCallback != null)
         {
+            m_CachedTransform.right = -collision.contacts[0].normal;
             SetGrapple(collision.gameObject);
             m_GrappleCallback();
+        }
+        else
+        {
+            m_Rigidbody.MoveRotation(m_PrevRotation);
         }
         //else
         //{

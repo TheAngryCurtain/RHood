@@ -489,8 +489,8 @@ MonoBehaviour:
   m_ShootForce: 5
   m_AlarmSprites:
   - {fileID: 0}
-  - {fileID: 21300000, guid: 6c71a41e15d0f7a45ae9489e608fcca6, type: 3}
-  - {fileID: 21300000, guid: 61d48642bff196149aec790c2acd0dd2, type: 3}
+  - {fileID: 21300004, guid: e60a0b6802b23c148a40ffa82196f90e, type: 3}
+  - {fileID: 21300006, guid: e60a0b6802b23c148a40ffa82196f90e, type: 3}
   m_AlarmIcon: {fileID: 212870271369922330}
   m_ChaseSpeed: 7
   m_MaxLookDistance: 10
